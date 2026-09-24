@@ -1,0 +1,37 @@
+---
+- name: Configure application servers
+  hosts: app_servers
+  become: true
+
+  vars:
+    app_user: appuser
+    app_dir: /opt/app
+
+  tasks:
+    - name: Ensure app user exists
+      user:
+        name: "{{ app_user }}"
+        shell: /bin/bash
+        create_home: true
+
+    - name: Install required packages
+      apt:
+        name:
+          - docker.io
+          - curl
+          - git
+        state: present
+        update_cache: true
+
+    - name: Ensure app directory exists
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: "{{ app_user }}"
+        mode: "0755"
+
+    - name: Enable and start Docker service
+      systemd:
+        name: docker
+        enabled: true
+        state: started
