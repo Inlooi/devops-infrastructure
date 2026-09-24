@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  labels:
+    app: infra-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: infra-app
+  template:
+    metadata:
+      labels:
+        app: infra-app
+    spec:
+      containers:
+        - name: app
+          image: infra-app:latest
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 15
